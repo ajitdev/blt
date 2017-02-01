@@ -117,7 +117,7 @@ script:
 
 deploy:
   provider: script
-  script: blt deploy -Ddeploy.commitMsg="Automated commit by Travis CI for Build ${TRAVIS_BUILD_ID}" -Ddeploy.branch="deploy-troubleshoot-build" && ls -lash deploy && phpunit ../blt/tests/phpunit --group=deploy
+  script: blt deploy -verbose -Ddeploy.commitMsg="Automated commit by Travis CI for Build ${TRAVIS_BUILD_ID}" -Ddeploy.branch="deploy-troubleshoot-build" && ls -lash deploy && phpunit ../blt/tests/phpunit --group=deploy
   skip_cleanup: true
   on:
     branch: deploy-troubleshoot
