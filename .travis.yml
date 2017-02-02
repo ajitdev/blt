@@ -9,6 +9,9 @@ php:
 matrix:
   fast_finish: true
 
+env:
+- DEPLOY_SOURCE_BRANCH=deploy-troubleshoot
+
 cache:
   bundler: true
   apt: true
@@ -107,8 +110,8 @@ script:
   # Add Drupal VM config to repo.
   - blt vm -Dvm.boot='false'
   # Update blt symlink prior to deploy.
-  - composer config repositories.blt.url '"../../blt"'
-  - rm composer.lock
+  - sed -i 's/..\/blt/..\/..\/blt/g' composer.json
+  - sed -i 's/..\/blt/..\/..\/blt/g' composer.lock
   # Deploy build artifact.
   - blt deploy:build
   # Run 'blt' phpunit tests, excluding deploy-push tests.
@@ -116,9 +119,15 @@ script:
   - ls -lash deploy
 
 deploy:
-  provider: script
-  script: blt deploy -verbose -Ddeploy.commitMsg="Automated commit by Travis CI for Build ${TRAVIS_BUILD_ID}" -Ddeploy.branch="deploy-troubleshoot-build" && ls -lash deploy && phpunit ../blt/tests/phpunit --group=deploy
-  skip_cleanup: true
-  on:
-    branch: deploy-troubleshoot
-    php: 5.6
+  - provider: script
+    script: blt deploy -Ddeploy.commitMsg="Automated commit by Travis CI for Build ${TRAVIS_BUILD_ID}" -Ddeploy.branch="$DEPLOY_SOURCE_BRANCH-build" && ls -lash deploy && phpunit ../blt/tests/phpunit --group=deploy
+    skip_cleanup: true
+    on:
+      branch: $DEPLOY_SOURCE_BRANCH
+      php: 5.6
+  - provider: script
+    script: git remote add github bolt8@svn-5223.devcloud.hosting.acquia.com:bolt8.git && git add -A && git commit -m "Automated commit by Travis CI for Build ${TRAVIS_BUILD_ID}" && git push origin $DEPLOY_SOURCE_BRANCH
+    skip_cleanup: true
+    on:
+      branch: $DEPLOY_SOURCE_BRANCH
+      php: 5.6
