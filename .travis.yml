@@ -110,9 +110,9 @@ script:
   # Add Drupal VM config to repo.
   - blt vm -Dvm.boot='false'
   # Update blt symlink prior to deploy. Changing from ../blt to ../../blt.
-  - sed -i 's/..\/blt/..\/..\/blt/g' composer.json
+  - sed -i 's/\.\.\/blt/\.\.\/\.\.\/blt/g' composer.json
   - cat composer.json
-  - sed -i 's/..\/blt/..\/..\/blt/g' composer.lock
+  - sed -i 's/\.\.\/blt/\.\.\/\.\.\/blt/g' composer.lock
   # Deploy build artifact.
   - blt deploy:build
   # Run 'blt' phpunit tests, excluding deploy-push tests.
